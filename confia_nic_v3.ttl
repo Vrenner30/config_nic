@@ -1,0 +1,88 @@
+; ============================================================
+; AUTOMAÇÃO NIC - COM SEQUÊNCIA DE ACORDAR (@@@)
+; ============================================================
+; Configuração do Menu
+strdim estados 3
+estados[0] = 'Mato Grosso (Energisa)'
+estados[1] = 'Outro Estado (Exemplo)'
+estados[2] = 'Sair'
+; Abre o menu
+listbox 'Selecione o estado para configurar:' 'Automaçao NIC' estados
+
+if result = -1 end
+choice = result
+if choice = 2 then
+   end
+endif
+; ============================================================
+; ROTINA DE ACORDAR O EQUIPAMENTO (@@@)
+; ============================================================
+messagebox 'Certifique-se que o cursor esta na janela do Tera Term. O processo vai comecar.' 'Atencao'
+; Envia @@@ três vezes com pausa de 1 segundo entre eles
+send '@@@'
+pause 1
+; Envia um ENTER para garantir que o prompt apareça
+sendln ''
+pause 1
+; ============================================================
+; BLOCO MATO GROSSO
+; ============================================================
+if choice = 0 then
+   ; --- Início dos Comandos ---
+   sendln '$userdef,----,ENERGISA MT,00000000'
+   pause 1
+   sendln '$simlib,1,ENERGISA.CLARO.COM.BR,10.200.1.204,40001,0,rs2000,rs2000,895505'
+   pause 1
+   sendln '$simlib,2,TIM.BR,191.6.4.114,40001,0,rs2000,rs2000,895502'
+   pause 1
+   sendln '$simlib,3,smart.m2m.vivo.com.br,191.6.4.114,40001,1,vivo,vivo,895506'
+   pause 1
+   sendln '$simlib,4,gprs.oi.com.br,191.6.4.114,40001,0,rs2000,rs2000,895531'
+   pause 1
+   sendln '$simlib,5,zap.vivo.com.br,191.6.4.114,40001,1,vivo,vivo,895511'
+   pause 1
+   sendln '$simlib,6,zap.vivo.com.br,191.6.4.114,40001,1,vivo,vivo,895523'
+   pause 1
+   sendln '$protocols,1,11,99,0,1'
+   pause 1
+   sendln '$CHANNELS,1,6'
+   pause 1
+   sendln '$scheds,1,6,31,0,86400'
+   pause 1
+   sendln '$scheds,1,3,10,0,900'
+   pause 1
+   sendln '$scheds,1,4,93,0,600'
+   pause 1
+   sendln '$scheds,1,7,30,01112025000000,1'
+   pause 1
+   ; --- Salvar e Reiniciar ---
+   sendln '$save'
+   pause 5
+   sendln '$restart'
+   ; --- Verificação Final ---
+   ; Mostra aviso e espera 15 segundos para o aparelho ligar de novo
+   messagebox 'O equipamento esta reiniciando. Aguarde a verificacao automatica.' 'Aguarde'
+   pause 41
+   send '@@@'
+   pause 1
+
+   ; Limpa a tela (opcional) e envia comandos de teste
+   sendln ''
+   sendln '$vers'
+   pause 1
+   sendln '$gsimlib'
+   messagebox 'Processo Finalizado! Verifique as respostas na tela.' 'Concluido'
+; ============================================================
+; BLOCO OUTRO ESTADO (Exemplo)
+; ============================================================
+elseif choice = 1 then
+   send '@@@'
+   pause 1
+   send '@@@'
+   pause 1
+   send '@@@'
+   pause 1
+   sendln ''
+   sendln '$userdef,----,ENERGISA OUTRO,00000000'
+   ; ... resto dos comandos ...
+endif
